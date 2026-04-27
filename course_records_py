@@ -1,0 +1,94 @@
+class Course:
+    def __init__(self,cname):
+        self.__cname=cname
+        self.__grade= 0
+        self.__credits= 0
+
+    def cname(self):
+        return self.__cname
+    
+    def grade(self):
+        return self.__grade
+    
+    def credits(self):
+        return self.__credits
+    
+    def add_course(self, grade, credits):
+        self.__grade = grade
+        self.__credits = credits
+
+    
+class CourseRecords:
+    def __init__(self):
+        self.__courses={}
+
+    def add_course(self,cname,grade,credits):
+        if not cname in self.__courses:
+            self.__courses[cname]=Course(cname)
+        if grade > self.__courses[cname].grade():    
+            self.__courses[cname].add_course(grade,credits)
+    
+    def get_course_data(self,cname):
+        if not cname in self.__courses:
+            return None
+        return self.__courses[cname]
+    
+    def statistics(self):
+        completed_courses= len(self.__courses)
+        if completed_courses == 0:
+            return "no completed courses"
+        total_credits=0
+        total_points=0
+        grade={5:"",4:"",3:"",2:"",1:""}
+        for _,course  in self.__courses.items():
+            total_credits +=course.credits()
+            total_points += course.grade()
+            grade[course.grade()] +="x"
+        mean = total_points/completed_courses
+        return f"{completed_courses} completed courses, a total of {total_credits} credits\nmean {mean:.1f}\ngrade distribution\n5: {grade[5]}\n4: {grade[4]}\n3: {grade[3]}\n2: {grade[2]}\n1: {grade[1]}"
+
+class CourseRecordsApplication:
+    def __init__(self):
+        self.__courserecords= CourseRecords()
+    
+    def help(self):
+        print("1 add course")
+        print("2 get course data")
+        print("3 statistics")
+        print("0 exit")
+
+    def add_course(self):
+        cname = input("course: ")
+        grade = int(input("grade: "))
+        credits = int(input("credits: "))
+        self.__courserecords.add_course(cname,grade,credits)
+    
+    def get_course_data(self):
+        cname = input("course: ")
+        data = self.__courserecords.get_course_data(cname)
+        if data == None:
+            print("no entry for this course")
+        else:
+            print(f"{data.cname()} ({data.credits()} cr) grade {data.grade()}")
+    
+    def statistics(self):
+        print(self.__courserecords.statistics())
+    
+    def execute(self):
+        self.help()
+        while True :
+            print("")
+            command= input("command: ")
+            if command == "1":
+                self.add_course()
+            elif command == "2":
+                self.get_course_data()
+            elif command == "3":
+                self.statistics()
+            elif command == "0":
+                break
+            else:
+                self.help()
+
+application = CourseRecordsApplication()
+application.execute()
